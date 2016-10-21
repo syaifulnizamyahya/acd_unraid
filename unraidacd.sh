@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 LOGFILE=/boot/acd_cli/logs/cloudstore-$(date "+%Y%m%d").log
-echo CloudSotre log $(date) $'\r'$'\r' >> $LOGFILE 2>&1
+echo CloudStore log $(date) $'\r'$'\r' >> $LOGFILE 2>&1
 echo "Starting Cloud Mounts" $'\r'>> $LOGFILE 2>&1
 
 #Get oauth_data file 
@@ -37,18 +37,19 @@ acdcli sync >> $LOGFILE 2>&1
 
 #Mount Amazon Cloud Drive (using screen)
 echo Mounting Amazon Cloud Drive >> $LOGFILE 2>&1
-screen -S acdcli -d -m /usr/bin/acd_cli -nl mount -fg -ao --uid 99 --gid 100 --modules="subdir,subdir=/Plex" /mnt/cache/cloud/.acd >> $LOGFILE 2>&1
+screen -S acdcli -d -m /usr/bin/acd_cli -nl mount -fg -ao --uid 99 --gid 100 --modules="subdir,subdir=/encfs" /mnt/user/Amazon/.acd >> $LOGFILE 2>&1
 
 #Mount Decrypted view of ACD
 echo Mounting ENCFS points >> $LOGFILE 2>&1
-echo <password> | ENCFS6_CONFIG='/boot/acd_cli/config/encfs.xml' encfs -S -o ro -o allow_other -o uid=99 -o gid=100 /mnt/cache/cloud/.acd/ /mnt/cache/cloud/acd/ >> $LOGFILE 2>&1
+echo <password> | ENCFS6_CONFIG='/boot/acd_cli/config/encfs.xml' encfs -S -o ro -o allow_other -o uid=99 -o gid=100 /mnt/user/Amazon/.acd/ /mnt/user/Amazon/acd/ >> $LOGFILE 2>&1
 
 #Mount Encrypted view of Local Media (Use for uploading Data to ACD)
-echo <password>| ENCFS6_CONFIG='/boot/acd_cli/config/encfs.xml' encfs -S --reverse -o ro -o allow_other -o uid=99 -o gid=100 /mnt/user/Media/ /mnt/cache/cloud/.local/ >> $LOGFILE 2>&1
+echo <password>| ENCFS6_CONFIG='/boot/acd_cli/config/encfs.xml' encfs -S --reverse -o ro -o allow_other -o uid=99 -o gid=100 /mnt/user/Amazon/local/ /mnt/user/Amazon/.local/ >> $LOGFILE 2>&1
 
 #Overlay Mount with Local Data taking preference. (Read Only)
 echo Mounting Overlay point >> $LOGFILE 2>&1
-mount -t overlay -o lowerdir=/mnt/user/Media/:/mnt/user/cloud/acd/ overlay /mnt/user/cloud/media/ >> $LOGFILE 2>&1
+mount -t overlay -o lowerdir=/mnt/user/Amazon/local/:/mnt/user/Amazon/acd/ overlay /mnt/user/Amazon/merged/ >> $LOGFILE 2>&1
 
+#Actions to run after mounting
 #Restart the plex docker (so it can see data in the mount point)
-docker restart plex
+#docker restart plex
