@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 LOGFILE=/boot/acd_cli/logs/cloudstore-$(date "+%Y%m%d").log
+echo Original script by wob76 at http://lime-technology.com/forum/index.php?topic=50516.msg506076#msg506076
 echo CloudStore log $(date) $'\r'$'\r' >> $LOGFILE 2>&1
 echo "Starting Cloud Mounts" $'\r'>> $LOGFILE 2>&1
 
