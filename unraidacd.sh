@@ -39,7 +39,7 @@ acdcli sync >> $LOGFILE 2>&1
 #Mount point info
 #On amazon, create a folder /encfs
 
-#Mount Amazon Cloud Drive (using screen)
+#Mount Amazon Cloud Drive (using screen). Screen can be install from nerdpack
 echo Mounting Amazon Cloud Drive >> $LOGFILE 2>&1
 screen -S acdcli -d -m /usr/bin/acd_cli -nl mount -fg -ao --uid 99 --gid 100 --modules="subdir,subdir=/encfs" /mnt/user/Amazon/.acd >> $LOGFILE 2>&1
 
