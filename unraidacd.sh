@@ -35,16 +35,24 @@ acdcli sync >> $LOGFILE 2>&1
 
 #Make sure acdcli sync is successfull. If not, keep calling acdcli sync untill successfull
 
+#Mount point info
+#On amazon, create a folder /encfs
+
 #Mount Amazon Cloud Drive (using screen)
 echo Mounting Amazon Cloud Drive >> $LOGFILE 2>&1
 screen -S acdcli -d -m /usr/bin/acd_cli -nl mount -fg -ao --uid 99 --gid 100 --modules="subdir,subdir=/encfs" /mnt/user/Amazon/.acd >> $LOGFILE 2>&1
 
+#Create a pair of encrypted and decrypted folders
+#encfs /mnt/user/Amazon/.acd/ /mnt/user/Amazon/acd/
+
+#Copy /mnt/user/Amazon/.acd/.encfs6.xml /boot/acd_cli/config/.encfs6.xml
+
 #Mount Decrypted view of ACD
 echo Mounting ENCFS points >> $LOGFILE 2>&1
-echo <password> | ENCFS6_CONFIG='/boot/acd_cli/config/encfs.xml' encfs -S -o ro -o allow_other -o uid=99 -o gid=100 /mnt/user/Amazon/.acd/ /mnt/user/Amazon/acd/ >> $LOGFILE 2>&1
+echo <password> | ENCFS6_CONFIG='/boot/acd_cli/config/.encfs6.xml' encfs -S -o ro -o allow_other -o uid=99 -o gid=100 /mnt/user/Amazon/.acd/ /mnt/user/Amazon/acd/ >> $LOGFILE 2>&1
 
 #Mount Encrypted view of Local Media (Use for uploading Data to ACD)
-echo <password>| ENCFS6_CONFIG='/boot/acd_cli/config/encfs.xml' encfs -S --reverse -o ro -o allow_other -o uid=99 -o gid=100 /mnt/user/Amazon/local/ /mnt/user/Amazon/.local/ >> $LOGFILE 2>&1
+echo <password>| ENCFS6_CONFIG='/boot/acd_cli/config/.encfs6.xml' encfs -S --reverse -o ro -o allow_other -o uid=99 -o gid=100 /mnt/user/Amazon/local/ /mnt/user/Amazon/.local/ >> $LOGFILE 2>&1
 
 #Overlay Mount with Local Data taking preference. (Read Only)
 echo Mounting Overlay point >> $LOGFILE 2>&1
