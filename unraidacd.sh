@@ -30,6 +30,11 @@ upgradepkg --install-new /boot/acd_cli/install/encfs-1.8.1-x86_64-1gv.txz >> $LO
 #Install acd_cli
 pip3 install --upgrade git+https://github.com/yadayada/acd_cli.git >> $LOGFILE 2>&1
 
+#get unionfs
+
+#install unionfs
+upgradepkg --install-new /boot/acd_cli/install/unionfs-fuse-0.26-x86_64-1dj.txz >> $LOGFILE 2>&1
+
 #Sleep for 10s and then run a acd_cli sync
 sleep 10s &&
 echo Syncing to Amazon Cloud Drive >> $LOGFILE 2>&1
