@@ -80,3 +80,7 @@ mount -t overlay -o lowerdir=/mnt/user/Amazon/local/:/mnt/user/Amazon/acd/ overl
 #Actions to run after mounting
 #Restart the plex docker (so it can see data in the mount point)
 #docker restart plex
+#Upload
+
+echo Uploading >> $LOGFILE 2>&1
+screen -S acdcli_upload -d -m /usr/bin/acd_cli upload --remove-source-files /mnt/user/Amazon/.local/ /encfs >> $LOGFILE 2>&1
