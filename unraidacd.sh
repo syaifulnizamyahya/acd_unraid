@@ -82,5 +82,6 @@ mount -t overlay -o lowerdir=/mnt/user/Amazon/local/:/mnt/user/Amazon/acd/ overl
 #docker restart plex
 #Upload
 
+#Move folder .local into folder encfs. Results would be /encfs/.local/{contents}
 echo Uploading >> $LOGFILE 2>&1
-screen -S acdcli_upload -d -m /usr/bin/acd_cli upload --remove-source-files /mnt/user/Amazon/.local/ /encfs >> $LOGFILE 2>&1
+screen -S acdcli_upload -d -m /usr/bin/acd_cli upload --remove-source-files /mnt/user/Amazon/.local /encfs >> $LOGFILE 2>&1
