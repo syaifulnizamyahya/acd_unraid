@@ -27,9 +27,7 @@ upgradepkg --install-new /boot/acd_cli/install/unionfs-fuse-0.26-x86_64-1dj.txz 
 #Install encfs
 upgradepkg --install-new /boot/acd_cli/install/encfs-1.8.1-x86_64-1gv.txz >> $LOGFILE 2>&1
 
-#Get acd_cli
-
-#Install acd_cli
+#Get and reinstall acd_cli
 pip3 install --upgrade git+https://github.com/yadayada/acd_cli.git >> $LOGFILE 2>&1
 
 #Sleep for 10s and then run a acd_cli sync
@@ -44,7 +42,9 @@ acdcli sync >> $LOGFILE 2>&1
 
 #Mount Amazon Cloud Drive (using screen)
 echo Mounting Amazon Cloud Drive >> $LOGFILE 2>&1
-screen -S acdcli -d -m /usr/bin/acd_cli -nl mount -fg -ao --uid 99 --gid 100 --modules="subdir,subdir=/encfs" /mnt/user/Amazon/.acd >> $LOGFILE 2>&1
+screen -S acdcli -d -m /usr/bin/acd_cli -nl mount -fg -ao --uid 99 --gid 100 \
+--modules="subdir,subdir=/encfs" \
+/mnt/user/Amazon/.acd >> $LOGFILE 2>&1
 
 #unmount
 #fusermount -u /mnt/user/Amazon/.acd
@@ -56,14 +56,26 @@ screen -S acdcli -d -m /usr/bin/acd_cli -nl mount -fg -ao --uid 99 --gid 100 --m
 
 #Mount Decrypted view of ACD
 echo Mount Decrypted view of ACD >> $LOGFILE 2>&1
-echo <password> | ENCFS6_CONFIG='/boot/acd_cli/config/.encfs6.xml' encfs -S -o ro -o allow_other -o uid=99 -o gid=100 /mnt/user/Amazon/.acd/ /mnt/user/Amazon/acd/ >> $LOGFILE 2>&1
+echo <password> | ENCFS6_CONFIG='/boot/acd_cli/config/.encfs6.xml' encfs \
+-S -o ro -o allow_other -o uid=99 -o gid=100 \
+/mnt/user/Amazon/.acd/ \
+/mnt/user/Amazon/acd/ >> $LOGFILE 2>&1
 
 #unmount
 #fusermount -u /mnt/user/Amazon/acd/
 
 #Mount Encrypted view of Local Media (Use for uploading Data to ACD)
+#echo Mount Encrypted view of Local Media >> $LOGFILE 2>&1
+#echo <password> | ENCFS6_CONFIG='/boot/acd_cli/config/.encfs6.xml' encfs \
+#-S --reverse -o rw -o allow_other -o uid=99 -o gid=100 \
+#/mnt/user/Amazon/local/ \
+#/mnt/user/Amazon/.local/ >> $LOGFILE 2>&1
+
 echo Mount Encrypted view of Local Media >> $LOGFILE 2>&1
-echo <password> | ENCFS6_CONFIG='/boot/acd_cli/config/.encfs6.xml' encfs -S --reverse -o rw -o allow_other -o uid=99 -o gid=100 /mnt/user/Amazon/local/ /mnt/user/Amazon/.local/ >> $LOGFILE 2>&1
+echo <password> | ENCFS6_CONFIG='/boot/acd_cli/config/.encfs6.xml' encfs \
+-S -o rw -o allow_other -o uid=99 -o gid=100 \
+/mnt/user/Amazon/.local/ \
+/mnt/user/Amazon/local/ >> $LOGFILE 2>&1
 
 #read only mount
 #echo <password> | ENCFS6_CONFIG='/boot/acd_cli/config/.encfs6.xml' encfs -S --reverse -o ro -o allow_other -o uid=99 -o gid=100 /mnt/user/Amazon/local/ /mnt/user/Amazon/.local/ >> $LOGFILE 2>&1
@@ -77,7 +89,9 @@ echo <password> | ENCFS6_CONFIG='/boot/acd_cli/config/.encfs6.xml' encfs -S --re
 
 #Unionfs Mount with Local Data taking preference. (Read Only)
 echo Mounting unionfs >> $LOGFILE 2>&1
-unionfs -o cow -o allow_other -o uid=99 -o gid=100 /mnt/user/Amazon/local=RW:/mnt/user/Amazon/acd=RO /mnt/user/Amazon/merged/ >> $LOGFILE 2>&1
+unionfs -o cow -o allow_other -o uid=99 -o gid=100 \
+/mnt/user/Amazon/local=RW:/mnt/user/Amazon/acd=RO \
+/mnt/user/Amazon/merged/ >> $LOGFILE 2>&1
 
 #unmount
 #fusermount -u /mnt/user/Amazon/merged/
@@ -95,4 +109,6 @@ unionfs -o cow -o allow_other -o uid=99 -o gid=100 /mnt/user/Amazon/local=RW:/mn
 
 #Upload
 echo Uploading to Amazon >> $LOGFILE 2>&1
-screen -S acdcli_upload -d -m /usr/bin/acd_cli upload --remove-source-files /mnt/user/Amazon/.local/fxR--l67TIkpk,/ /encfs/ >> $LOGFILE 2>&1
+screen -S acdcli_upload -d -m /usr/bin/acd_cli upload --remove-source-files \
+/mnt/user/Amazon/.local/* \
+/encfs/ >> $LOGFILE 2>&1
